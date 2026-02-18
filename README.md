@@ -10,17 +10,7 @@
 
 </div>
 
-## 📋 Table of Contents
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Quick Start](#-quick-start)
-- [Configuration](#-configuration)
-- [Stress Testing](#-stress-testing)
-- [Common Issues](#-common-issues)
-- [Project Structure](#-project-structure)
-- [Complete Code](#-complete-code)
-
-## 🚀 Features
+## Features
 
 - **Real-time monitoring** of CPU, memory, and system load
 - **Rule-based auto-throttling** with configurable thresholds and durations
@@ -30,36 +20,8 @@
 - **Live process viewer** showing top CPU consumers
 - **Comprehensive action logging** for audit trails
 
-┌─────────────────────────────────────┐
-│ Resguard Daemon │
-├─────────────────────────────────────┤
-│ ┌─────────┐ ┌─────────┐ ┌─────┐ │
-│ │ Metrics │ │ Process │ │Rules│ │
-│ │ Scanner │──│ Scanner │──│Engine│ │
-│ └─────────┘ └─────────┘ └──┬──┘ │
-│ │ │ │ │
-│ ▼ ▼ ▼ │
-│ ┌───────────────────────────────┐ │
-│ │ Cgroup Limiter │ │
-│ │ (CPU/Memory/Stop actions) │ │
-│ └───────────────────────────────┘ │
-└─────────────────────────────────────┘
-│
-▼
-┌─────────────────┐
-│ Systemd/Init │
-│ cgroups v2 │
-└─────────────────┘
+## Quick Start
 
-
-
-
-
-
-
-## ⚡ Quick Start
-
-```bash
 # Clone and build
 git clone https://github.com/NickIBrody/Loadmonitor.git
 cd Loadmonitor
@@ -68,51 +30,49 @@ cargo build --release
 # Run (use sudo for cgroups)
 sudo ./target/release/resguard
 
-
 # Configuration
+
 Create config.toml in the project root:
+
 [general]
-interval_secs = 5          # Check every 5 seconds
-history_size = 1000        # Keep last 1000 actions
+interval_secs = 5
+history_size = 1000
 
 [limits]
 cgroup_base_path = "/sys/fs/cgroup"
-default_cpu_quota = 50.0   # Default CPU limit if not specified
-default_memory_limit = 1073741824  # 1GB default
-blacklist = ["systemd", "kernel", "init"]  # Never throttle these
-whitelist = []              # Only throttle these (empty = all)
+default_cpu_quota = 50.0
+default_memory_limit = 1073741824
+blacklist = ["systemd", "kernel", "init"]
+whitelist = []
 
-[[rules]]  # First rule: High CPU
+[[rules]]
 name = "high-cpu"
-duration_secs = 30           # Must exceed threshold for 30 seconds
-
+duration_secs = 30
 [rules.condition]
 type = "CpuOver"
-threshold = 90.0             # CPU usage > 90%
-
+threshold = 90.0
 [rules.action]
 type = "LimitCpu"
-max_percent = 40.0            # Throttle to 40% CPU
+max_percent = 40.0
 
-[[rules]]  # Second rule: High memory
+[[rules]]
 name = "high-memory"
 duration_secs = 60
-
 [rules.condition]
 type = "MemoryOver"
-threshold = 8589934592       # 8GB
-
+threshold = 8589934592
 [rules.action]
 type = "LimitMemory"
-max_bytes = 4294967296        # Limit to 4GB
+max_bytes = 4294967296
+
 
 
 # Stress Testing
 
 Terminal 1 - Run Resguard
+
 cd ~/Loadmonitor
 sudo cargo run
-
 
 Terminal 2 - Generate Load
 # Install stress tool if needed
@@ -123,9 +83,6 @@ stress --cpu 4 --timeout 120
 
 # Memory stress test (2 processes allocating 1GB each)
 stress --vm 2 --vm-bytes 1G --timeout 60
-
-# Combined stress test
-stress --cpu 2 --vm 1 --vm-bytes 512M --timeout 90
 
 
 # Expected Output
@@ -141,43 +98,92 @@ Memory: 2111 MB / 3795 MB
   PID  34706: resguard             - CPU:  16.7%   RAM: 21 MB
   PID  34912: stress               - CPU:  12.5%   RAM: 0 MB
   PID  34913: stress               - CPU:   8.3%   RAM: 0 MB
+  PID   1182: Xorg                 - CPU:   4.2%   RAM: 44 MB
 
 ⚠️  APPLYING LimitCpu(40.0) to PID 34912 (stress) - CPU: 22.0%
 ✅ Limit applied
 
 
-# Key technical errors:
+# 1. Common Issues & Solutions
+ Permission Denied
+Error: Permission denied (os error 13)
+Solution: Run with sudo - cgroups require root:
+sudo cargo run
 
-2. **Missing traits** - Forgot `SystemExt`, `CpuExt`, `PidExt` imports for system methods
+# 2. TOML Parse Error
+Error: TOML parse error - missing field `blacklist`
+Solution: Ensure blacklist and whitelist are inside [limits] section.
 
-3. **TOML structure** - `blacklist/whitelist` placed at root instead of inside `[limits]` section
+# 3. No Processes Showing
+🔥 Top CPU processes:
+  No active processes (>0.1% CPU)
 
-4. **Type mismatches** - Confused `&Path` with `Option`, needed type casting for memory thresholds
 
+#  4. Compilation Errors
+
+error: package `rayon-core` requires rustc 1.80 or newer
+
+Solution: Update Rust:
+rustup update stable
 
 # Project Structure
 resguard/
-├── Cargo.toml              # Dependencies and package config
-├── config.toml             # User configuration
-├── README.md               # This file
+├── Cargo.toml
+├── config.toml
+├── README.md
 └── src/
-    ├── main.rs             # Main daemon loop
-    ├── config.rs            # Configuration parsing
-    ├── errors.rs            # Error types
+    ├── main.rs
+    ├── config.rs
+    ├── errors.rs
     ├── metrics/
-    │   └── mod.rs           # CPU/memory metrics collection
+    │   └── mod.rs
     ├── process/
-    │   └── mod.rs           # Process scanning and matching
+    │   └── mod.rs
     ├── rules/
-    │   └── mod.rs           # Rule engine and evaluation
+    │   └── mod.rs
     └── limiter/
-        └── mod.rs           # cgroups v2 integration
+        └── mod.rs
+        
+    # Technical Challenges Solved
 
 
+
+Missing Trait Imports
+
+
+// Before
+use sysinfo::{System};  // Methods not available
+
+// After
+use sysinfo::{System, SystemExt, CpuExt, PidExt};
+
+
+TOML Structure
+# Before (wrong)
+blacklist = []
+
+# After (correct)
+[limits]
+cgroup_base_path = "/sys/fs/cgroup"
+blacklist = ["systemd"]
+
+# Type System Fixes
+// Path handling
+let exe_string = exe_path.to_string_lossy().to_string();
+
+// Type casting
+RuleCondition::MemoryOver(*threshold as u64)
 
 # License
 MIT
 
 
 
-## 🏗️ Architecture
+
+
+
+
+
+
+
+
