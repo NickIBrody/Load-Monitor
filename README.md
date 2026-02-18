@@ -8,6 +8,8 @@
 
 **A production-ready system daemon that automatically detects and throttles resource-hungry processes using cgroups v2**
 
+![Resguard Monitoring](screenshots/running.png)
+
 </div>
 
 ## Features
