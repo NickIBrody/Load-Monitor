@@ -1,4 +1,4 @@
-# Resguard - System Load Monitor with Auto-Throttling
+# Load-Monitor - System Load Monitor with Auto-Throttling
 
 <div align="center">
   
