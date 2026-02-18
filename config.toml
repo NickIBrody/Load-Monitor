@@ -1,0 +1,30 @@
+[general]
+interval_secs = 5
+history_size = 1000
+
+[limits]
+cgroup_base_path = "/sys/fs/cgroup"
+default_cpu_quota = 50.0
+default_memory_limit = 1073741824
+blacklist = ["systemd", "kernel", "init"]
+whitelist = []
+
+[[rules]]
+name = "high-cpu"
+duration_secs = 30
+[rules.condition]
+type = "CpuOver"
+threshold = 90.0
+[rules.action]
+type = "LimitCpu"
+max_percent = 40.0
+
+[[rules]]
+name = "high-memory"
+duration_secs = 60
+[rules.condition]
+type = "MemoryOver"
+threshold = 8589934592
+[rules.action]
+type = "LimitMemory"
+max_bytes = 4294967296
