@@ -128,29 +128,7 @@ error: package `rayon-core` requires rustc 1.80 or newer
 Solution: Update Rust:
 rustup update stable
 
-# Project Structure
-resguard/
-├── Cargo.toml
-├── config.toml
-├── README.md
-└── src/
-    ├── main.rs
-    ├── config.rs
-    ├── errors.rs
-    ├── metrics/
-    │   └── mod.rs
-    ├── process/
-    │   └── mod.rs
-    ├── rules/
-    │   └── mod.rs
-    └── limiter/
-        └── mod.rs
-        
-    # Technical Challenges Solved
 
-
-
-Missing Trait Imports
 
 
 // Before
@@ -180,7 +158,29 @@ RuleCondition::MemoryOver(*threshold as u64)
 MIT
 
 
+# Project Structure
 
+```text
+Load-Monitor/
+├── .gitignore
+├── Cargo.toml
+├── config.toml
+├── LICENSE
+├── README.md
+├── screenshots/
+│   └── (скрины всякие, ленивая жопа)
+└── src/
+    ├── config.rs
+    ├── errors.rs
+    ├── limiter/
+    │   └── mod.rs
+    ├── main.rs
+    ├── metrics/
+    │   └── mod.rs
+    ├── process/
+    │   └── mod.rs
+    └── rules/
+        └── mod.rs
 
 
 
