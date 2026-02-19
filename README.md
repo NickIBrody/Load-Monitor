@@ -168,7 +168,7 @@ Load-Monitor/
 ├── LICENSE
 ├── README.md
 ├── screenshots/
-│   └── (скрины всякие, ленивая жопа)
+│
 └── src/
     ├── config.rs
     ├── errors.rs
