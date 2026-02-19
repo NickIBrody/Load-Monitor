@@ -1,0 +1,27 @@
+# Build artifacts
+debug/
+target/
+
+# Backup files
+*.rs.bk
+*.sw?
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors/IDEs
+.vscode/
+.idea/
+
+# Personal configs (don't commit secrets!)
+config.local.toml
+.env
+secrets.toml
+
+# Profiling/coverage (add later if needed)
+flamegraph.svg
+perf.data
+*.profraw
+coverage/
