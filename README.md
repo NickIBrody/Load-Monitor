@@ -1,9 +1,10 @@
 # Load-Monitor - System Load Monitor with Auto-Throttling
 
   
-![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![cgroups](https://img.shields.io/badge/cgroups-v2-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Status](https://img.shields.io/badge/status-alpha-orange.svg)
+![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)
+![Platform](https://img.shields.io/badge/platform-linux%20%7C%20wsl-lightgrey.svg)
 
 # Load Monitor (Resguard)
 
@@ -135,22 +136,6 @@ stress --vm 2 --vm-bytes 1G --timeout 60
 You should see rules being triggered in the console output.
 
 
-# Project Structure
-Load-Monitor/
-├── Cargo.toml
-├── config.toml
-├── README.md
-└── src/
-    ├── main.rs
-    ├── config.rs
-    ├── errors.rs
-    ├── metrics/
-    ├── process/
-    ├── rules/
-    └── limiter/
-
-
-
 # ⚠️ Important Notes
 Requires root privileges.
 
@@ -223,8 +208,29 @@ Unit and integration tests
 
 Created as a Rust systems programming project focused on process control and resource management.
 
+![GitHub stars](https://img.shields.io/github/stars/NickIBrody/Load-Monitor?style=for-the-badge&logo=github)
+![GitHub forks](https://img.shields.io/github/forks/NickIBrody/Load-Monitor?style=for-the-badge&logo=github)
+![GitHub issues](https://img.shields.io/github/issues/NickIBrody/Load-Monitor?style=for-the-badge&logo=github)
 
+### 📂 Project Structure
 
-
+```text
+Load-Monitor/
+├── Cargo.toml          # Dependencies & metadata
+├── config.toml         # Example configuration
+├── README.md           # Project documentation
+├── LICENSE             # MIT License
+└── src/
+    ├── main.rs         # Entry point & async runtime
+    ├── config.rs       # TOML config parsing (serde)
+    ├── errors.rs       # Custom error types (thiserror)
+    ├── metrics/
+    │   └── mod.rs      # System metrics collection (sysinfo)
+    ├── process/
+    │   └── mod.rs      # Process scanning & filtering
+    ├── rules/
+    │   └── mod.rs      # Rule engine & condition evaluation
+    └── limiter/
+        └── mod.rs      # Cgroups v2 resource limiting
 
 
