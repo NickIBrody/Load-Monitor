@@ -189,9 +189,18 @@ Run lints:
 cargo clippy
 
 
-# 📜 License
+## ⚠️ Early Alpha / Experimental
 
-MIT License
+This project is in early development and **not ready for production use**. 
+Known issues: PID reuse risks, cgroup leaks, no graceful shutdown. 
+Intended for learning, local testing, and community feedback. 
+Use only in isolated environments and avoid long-running sessions. 
+Contributions and constructive feedback welcome! 
+
+
+# License & Disclaimer
+Distributed under the MIT License. See LICENSE for details.
+Disclaimer: This software is provided "as is", without warranty of any kind. Use at your own risk. The authors are not liable for any damage, data loss, or service disruption resulting from its use. Always test thoroughly in a safe environment before deploying anywhere that matters.
 
 
 # 💡 Future Improvements
