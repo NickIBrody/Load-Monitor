@@ -1,41 +1,63 @@
 # Load-Monitor - System Load Monitor with Auto-Throttling
 
-<div align="center">
   
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 ![cgroups](https://img.shields.io/badge/cgroups-v2-blue?style=for-the-badge)
 
-**A production-ready system daemon that automatically detects and throttles resource-hungry processes using cgroups v2**
+# Load Monitor (Resguard)
 
-![test](screenshots/running.jpg)
+A Linux process load monitoring and automatic resource limiting tool written in Rust.
 
-</div>
+Load Monitor continuously observes system processes and applies configurable rules to limit CPU or memory usage using cgroups v2 when defined thresholds are exceeded.
 
-## Features
+> Designed for Linux systems with cgroups v2 enabled.
 
-- **Real-time monitoring** of CPU, memory, and system load
-- **Rule-based auto-throttling** with configurable thresholds and durations
-- **cgroups v2 integration** for CPU and memory limits
-- **Process whitelist/blacklist** support
-- **Systemd service detection** for service-level limiting
-- **Live process viewer** showing top CPU consumers
-- **Comprehensive action logging** for audit trails
+---
 
-## Quick Start
+## 🚀 Features
 
-# Clone and build
-git clone https://github.com/NickIBrody/Loadmonitor.git
-cd Loadmonitor
+- Real-time system metrics collection (CPU, memory, load average)
+- Per-process monitoring
+- Rule-based resource limiting
+- CPU and memory restriction via cgroups v2
+- Configurable duration thresholds
+- Process termination support
+- Live top CPU process viewer
+- Structured configuration via TOML
+
+---
+
+## 📦 Requirements
+
+- Linux (cgroups v2 enabled)
+- Rust (stable toolchain)
+- Root privileges (required for cgroups manipulation)
+
+Check cgroups version:
+
+stat -fc %T /sys/fs/cgroup
+
+It should return cgroup2fs.
+
+
+# 🔧 Installation
+
+Clone and build:
+
+git clone https://github.com/yourusername/Load-Monitor.git
+cd Load-Monitor
 cargo build --release
 
-# Run (use sudo for cgroups)
-sudo ./target/release/resguard
+Run (requires root):
 
-# Configuration
+sudo ./target/release/load-monitor
 
-Create config.toml in the project root:
 
+# ⚙️ Configuration
+
+Create a config.toml in the project root.
+Example Configuration
 [general]
 interval_secs = 5
 history_size = 1000
@@ -50,9 +72,11 @@ whitelist = []
 [[rules]]
 name = "high-cpu"
 duration_secs = 30
+
 [rules.condition]
 type = "CpuOver"
 threshold = 90.0
+
 [rules.action]
 type = "LimitCpu"
 max_percent = 40.0
@@ -60,129 +84,135 @@ max_percent = 40.0
 [[rules]]
 name = "high-memory"
 duration_secs = 60
+
 [rules.condition]
 type = "MemoryOver"
 threshold = 8589934592
+
 [rules.action]
 type = "LimitMemory"
 max_bytes = 4294967296
 
 
+# How It Works
 
-# Stress Testing
+1 The application collects system metrics at a configurable interval.
 
-Terminal 1 - Run Resguard
+2 It scans running processes.
 
-cd ~/Loadmonitor
-sudo cargo run
+3 Each process is evaluated against defined rules.
 
-Terminal 2 - Generate Load
-# Install stress tool if needed
-sudo apt install stress -y
+4 If a rule condition is continuously satisfied for duration_secs,
+the configured action is applied.
 
-# CPU stress test (4 cores for 2 minutes)
+5 The action is executed via Linux cgroups v2.
+
+# Supported Rule Conditions
+
+| Condition    | Description                                                  |
+| ------------ | ------------------------------------------------------------ |
+| `CpuOver`    | Triggers when process CPU usage exceeds threshold (%)        |
+| `MemoryOver` | Triggers when process memory usage exceeds threshold (bytes) |
+| `And`        | Combines multiple conditions                                 |
+
+
+
+# Supported Actions
+| Action        | Description                           |
+| ------------- | ------------------------------------- |
+| `LimitCpu`    | Applies CPU quota via `cpu.max`       |
+| `LimitMemory` | Applies memory limit via `memory.max` |
+| `Stop`        | Sends SIGTERM to the process          |
+
+
+# 🔬 Stress Testing
+Install stress tool:
+sudo apt install stress
+# CPU test:
 stress --cpu 4 --timeout 120
-
-# Memory stress test (2 processes allocating 1GB each)
+# Memory test:
 stress --vm 2 --vm-bytes 1G --timeout 60
-
-
-# Expected Output
-✅ Resguard started. Monitoring processes...
-📊 Check interval: 5 sec
-⚙️  Rules loaded: 2
-
---- 14:23:45 ---
-Total CPU: 34.0%
-Memory: 2111 MB / 3795 MB
-
-🔥 Top CPU processes:
-  PID  34706: resguard             - CPU:  16.7%   RAM: 21 MB
-  PID  34912: stress               - CPU:  12.5%   RAM: 0 MB
-  PID  34913: stress               - CPU:   8.3%   RAM: 0 MB
-  PID   1182: Xorg                 - CPU:   4.2%   RAM: 44 MB
-
-⚠️  APPLYING LimitCpu(40.0) to PID 34912 (stress) - CPU: 22.0%
-✅ Limit applied
-
-
-# 1. Common Issues & Solutions
- Permission Denied
-Error: Permission denied (os error 13)
-Solution: Run with sudo - cgroups require root:
-sudo cargo run
-
-# 2. TOML Parse Error
-Error: TOML parse error - missing field `blacklist`
-Solution: Ensure blacklist and whitelist are inside [limits] section.
-
-# 3. No Processes Showing
-🔥 Top CPU processes:
-  No active processes (>0.1% CPU)
-
-
-#  4. Compilation Errors
-
-error: package `rayon-core` requires rustc 1.80 or newer
-
-Solution: Update Rust:
-rustup update stable
-
-
-
-
-// Before
-use sysinfo::{System};  // Methods not available
-
-// After
-use sysinfo::{System, SystemExt, CpuExt, PidExt};
-
-
-TOML Structure
-# Before (wrong)
-blacklist = []
-
-# After (correct)
-[limits]
-cgroup_base_path = "/sys/fs/cgroup"
-blacklist = ["systemd"]
-
-# Type System Fixes
-// Path handling
-let exe_string = exe_path.to_string_lossy().to_string();
-
-// Type casting
-RuleCondition::MemoryOver(*threshold as u64)
-
-# License
-MIT
+You should see rules being triggered in the console output.
 
 
 # Project Structure
-
-```text
 Load-Monitor/
-├── .gitignore
 ├── Cargo.toml
 ├── config.toml
-├── LICENSE
 ├── README.md
-├── screenshots/
-│
 └── src/
+    ├── main.rs
     ├── config.rs
     ├── errors.rs
-    ├── limiter/
-    │   └── mod.rs
-    ├── main.rs
     ├── metrics/
-    │   └── mod.rs
     ├── process/
-    │   └── mod.rs
-    └── rules/
-        └── mod.rs
+    ├── rules/
+    └── limiter/
 
 
+
+# ⚠️ Important Notes
+Requires root privileges.
+
+Works only on Linux with cgroups v2.
+
+Improper rule configuration may limit critical system processes.
+
+Cgroup directories are created dynamically per limited process.
+
+Designed for controlled environments and testing.
+
+
+
+
+# Limitations
+
+No automatic cleanup of created cgroups (yet).
+
+No persistent action history.
+
+No remote management interface.
+
+Not yet optimized for extremely high process counts.
+
+Whitelist/blacklist matching may require further refinement.
+
+
+# Development
+Run in debug mode:
+cargo run
+
+Format code:
+cargo fmt
+
+Run lints:
+cargo clippy
+
+
+# 📜 License
+
+MIT License
+
+
+# 💡 Future Improvements
+
+Persistent action logging
+
+Automatic cgroup cleanup
+
+Better PID reuse handling
+
+Web dashboard
+
+Structured logging
+
+Prometheus metrics export
+
+Unit and integration tests
+
+# Author
+
+Created as a Rust systems programming project focused on process control and resource management.
 
 
 
