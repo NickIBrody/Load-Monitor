@@ -46,7 +46,7 @@ It should return cgroup2fs.
 
 Clone and build:
 
-git clone https://github.com/yourusername/Load-Monitor.git
+https://github.com/NickIBrody/Load-Monitor
 cd Load-Monitor
 cargo build --release
 
