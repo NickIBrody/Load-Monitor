@@ -49,8 +49,17 @@ pub enum Action {
 
 impl Config {
     pub fn load(path: &str) -> anyhow::Result<Self> {
-        let contents = fs::read_to_string(path)?;
-        let config: Config = toml::from_str(&contents)?;
+        let contents = fs::read_to_string(path)
+            .map_err(|e| anyhow::anyhow!("Cannot read {path}: {e}"))?;
+        let config: Config = toml::from_str(&contents)
+            .map_err(|e| anyhow::anyhow!("Invalid config: {e}"))?;
         Ok(config)
+    }
+
+    pub fn save(&self, path: &str) -> anyhow::Result<()> {
+        let contents = toml::to_string_pretty(self)
+            .map_err(|e| anyhow::anyhow!("Serialize error: {e}"))?;
+        fs::write(path, contents)?;
+        Ok(())
     }
 }
