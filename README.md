@@ -11,29 +11,6 @@ A Linux system load monitor with **interactive TUI**, real-time metrics, and aut
 
 ---
 
-## 🖥️ Interface
-
-```
-╔══════════════════════════ ⚡ LOAD MONITOR ════════════════════════════╗
-║  ┌─ CPU ──────────────┐  ┌─ RAM ──────────────┐  ┌─ Load avg ───┐  ║
-║  │ ████████░░  65.2%  │  │ ██████░░  8.1/16GB  │  │  1m   1.24  │  ║
-║  └────────────────────┘  └────────────────────┘  │  5m   0.98  │  ║
-║                                                   │ 15m   0.81  │  ║
-║                                                   └─────────────┘  ║
-╠═══════════════════════════════════════════════════════════════════════╣
-║  [1] Monitor    [2] Rules    [3] Settings    [4] Log                 ║
-╠═══════════════════════════════════════════════════════════════════════╣
-║     PID  Name                  CPU%     RAM    Service   Status      ║
-║  ▶  1234  firefox               45.1%   2.1G   —         ⚠ high cpu  ║
-║     5678  chrome                12.3%   1.2G   —         normal      ║
-║     9012  code                   8.7%   512M   —         normal      ║
-╠═══════════════════════════════════════════════════════════════════════╣
-║  [Tab] switch tab  [s] sort  [r] reload config  [q] quit             ║
-╚═══════════════════════════════════════════════════════════════════════╝
-```
-
----
-
 ## ✨ Features
 
 - **Interactive TUI** — full-screen terminal UI built with [ratatui](https://github.com/ratatui-org/ratatui)
